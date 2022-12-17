@@ -49,7 +49,7 @@ function Product() {
     const {state ,dispatch} = useContext(Store);
 
     const [product, setProduct] = useState<OrxProducts>({
-        _id: '',
+        _id: null,
         name: '',
         slug: '',
         category: [],
@@ -103,7 +103,7 @@ function Product() {
       on: false
     })
 
-    console.log('WWWWWWWWWWW', reviews);
+    
     
     const toast = (text, type) => {
       setToastDetails({
@@ -122,12 +122,12 @@ function Product() {
         productSlug: router.query.slug
       }).then((res) => {
         if (res.data.Error) {
-          console.log("OWWWWWWWWWWWWWWWWW");
+          
           
           
         } else {
           setReviews(res.data)
-          console.log(res.data, "KKKKKKKKKKKKK");
+          
           
         }
       })
