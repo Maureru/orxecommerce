@@ -47,7 +47,7 @@ function Toast({toast = {text: '', type: 'success', on: false}, setToastDetails}
   
     
   return (
-    <motion.div variants={toastAnim} initial="hide" animate={control} className='fixed z-50 top-16 right-5 flex gap-2 items-center rounded-xl p-2 bg-[#FF7B7B]'>
+    <motion.div variants={toastAnim} initial="hide" animate={control} className={`fixed z-50 top-16 right-5 flex gap-2 items-center rounded-xl p-2 ${toast.type === "success" ? 'bg-[#108b00]' : 'bg-[#FF7B7B]'}`}>
         <p className='font-semibold'>{toast.text}</p>
         {
           toast.type === 'success' ? <BsCheckCircleFill className=''/> : <MdError/>

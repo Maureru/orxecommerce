@@ -17,18 +17,20 @@ export default async function handler(req, res) {
       email: email,
       password: hashPassword,
       isAdmin: isAdmin,
+      itemsBought: 0,
+      totalSpent: 0,
     });
     const newUser = await user.save();
     await db.disconnect();
-    const token = signToken(newUser);
     res.json({
-      token,
       _id: newUser._id,
       name: newUser.name,
       email: newUser.email,
       isAdmin: newUser.isAdmin,
+      itemsBought: newUser.itemsBought,
+      totalSpent: newUser.totalSpent,
     });
   } catch (err) {
-    res.json({ err: err });
+    res.json({ Error: 'Network Error, try again' });
   }
 }

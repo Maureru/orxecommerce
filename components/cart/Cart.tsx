@@ -8,9 +8,10 @@ import { TbMoodEmpty } from 'react-icons/tb';
 import Button from '../Misc/Button';
 import girl from '../../public/assets/bag.png'
 import { Store } from '../../store/Store';
+import { useRouter } from 'next/router';
 
 function Cart({setIsCartOpen}: {setIsCartOpen: () => void}) {
-
+    const router = useRouter()
     const cartRef = useRef(null)
 
     const {state, dispatch} = useContext(Store);
@@ -58,7 +59,7 @@ function Cart({setIsCartOpen}: {setIsCartOpen: () => void}) {
                                 <Image src={item.image} layout="fill" objectFit='cover' alt="cartItem"/>
                             </div>
                             <div className='w-[50%] flex flex-col justify-around p-2'>
-                                <p className='font-semibold text-[13px]'>{item.name}</p>
+                                <p className='font-semibold text-[13px]'>{item.name.slice(0,50)} {item.name.length > 50 ? '...': null}</p>
                                 <div className='flex items-center gap-2'>
                                     <p>${item.price}</p>
                                     <p className='text-[10px] text-zinc-800'>x{item.quantity}</p>
@@ -103,7 +104,9 @@ function Cart({setIsCartOpen}: {setIsCartOpen: () => void}) {
         </div>
         {
             cartItems.length === 0 ? null : <div className='flex flex-col px-8 py-2'>
-            <Button className='bg-white py-2 flex items-center justify-center gap-3 font-semibold'>Checkout <BsFillHandbagFill className='text-[#D3BDA0]'/><p>Total: ${sum}</p></Button>
+            <Button onClick={() => {
+                router.push("/checkout")
+            }} className='bg-white py-2 flex items-center justify-center gap-3 font-semibold'>Checkout <BsFillHandbagFill className='text-[#D3BDA0]'/><p>Total: ${sum}</p></Button>
         </div>
         }
     </div>

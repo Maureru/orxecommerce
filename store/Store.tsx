@@ -27,9 +27,20 @@ export type User = {
 
 const initialState: {
   cart: {
-    cartItems: CartItem[]
+    cartItems: CartItem[],
+    shippingAddress: {
+      fullName: string,
+      streetAddress: string,
+      streetAddress2: string,
+      city: string,
+      state: string,
+      postalCode: string,
+      country: string,
+      phone: number,
+      email: string
+    }
   },
-  user: User
+  user: User,
 } = {
     cart: {
         cartItems: Cookies.get("cartItems") ? JSON.parse(Cookies.get("cartItems")) :  [
@@ -55,14 +66,19 @@ const initialState: {
           }, */
           
         
-        ]
+        ],
+        shippingAddress: Cookies.get('shippingAddress') ? JSON.parse(Cookies.get('shippingAddress')) : null
     },
     user: Cookies.get('user') ? JSON.parse(Cookies.get('user')) : null,
+    
 }
 
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case 'ADD_SHIPPING':
+      Cookies.set('shippingAddress', JSON.stringify(action.payload))
+      return {... state, shippingAddress: action.payload}
     case 'ADD_TO_CART':
 
       const existItem = state.cart.cartItems.find((item) => item._id === action.payload._id)
@@ -74,6 +90,9 @@ const reducer = (state, action) => {
       
       Cookies.set('cartItems', JSON.stringify(cartItems))
       return { ...state, cart: { ...state.cart, cartItems: cartItems}}
+    case 'CLEAR_CART': 
+      Cookies.remove("cartItems")
+      return { ...state, cart: {...state.cart, cartItems: []}}
     case 'REMOVE_CART':
       const cartItem = state.cart.cartItems.filter((item) => item._id != action.payload._id)
       Cookies.set('cartItems', JSON.stringify(cartItem));
@@ -86,6 +105,7 @@ const reducer = (state, action) => {
       Cookies.set('user', JSON.stringify(action.payload))
       return {...state, user: action.payload}
     case 'LOGOUT':
+      Cookies.remove('user')
       return {...state, user: null}
   }
     

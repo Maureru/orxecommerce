@@ -31,7 +31,7 @@ function CardProduct({product, setIsEdit, setEditProduct, openAdd = () => {}}) {
                 setIsEdit(true)
                 openAdd()
             }} className='absolute right-2 top-2 cursor-pointer p-2 bg-[#F4ECE3] rounded-full'><MdModeEdit/></div>
-            <p className='text-center text-[11px] lg:text-sm text-white'>{product.name}</p>
+            <p className='text-center text-[11px] lg:text-sm text-white'>{product.name.slice(0, 50)} {product.name.length > 50 ? '...' : null}</p>
             <p className='absolute bottom-1 right-1 text-[11px] py-1 px-2 bg-[#F4ECE3] rounded-lg'>{product.numSold === 0 ? null : <>{product.numSold} Sold</>}</p>
         </div>
         <Image src={product.image} className='group-hover:scale-125 transition-all duration-100' alt='pr' layout="fill" objectFit="cover" />

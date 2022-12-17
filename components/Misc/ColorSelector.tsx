@@ -10,7 +10,7 @@ function ColorSelector({colors = [], addCart, setAddCart}) {
   
     return (
 
-    <div className='flex gap-2 mt-2'>
+    <div className='flex flex-wrap gap-2 mt-2'>
         {
             colors.map((color, i) => (
                 <div style={{backgroundColor: `${color}`}} key={i} onClick={() => {setAddCart({...addCart, color: color})}}  className={`cursor-pointer h-12 w-12 overflow-hidden rounded-full`}>

@@ -13,6 +13,7 @@ import { Store } from '../../../store/Store';
 import { FaPaperPlane } from "react-icons/fa";
 import Image from 'next/image';
 import Toast from '../../../components/Misc/Toast';
+import { BraintreePayPalButtons, PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 
 /* export async function getServerSideProps(context) {
@@ -40,13 +41,15 @@ import Toast from '../../../components/Misc/Toast';
 
 function Product() {
     const router = useRouter()
+    const [mount, setMount] = useState(false)
 
     
     
 
-    const {dispatch} = useContext(Store);
+    const {state ,dispatch} = useContext(Store);
 
     const [product, setProduct] = useState<OrxProducts>({
+        _id: '',
         name: '',
         slug: '',
         category: [],
@@ -74,6 +77,19 @@ function Product() {
       size: ''
     })
 
+    const [reviewForm, setReviewForm] = useState(
+      {
+        user: '',
+        product: '',
+        productSlug: '',
+        rating: 0,
+        message: '',
+        isAdmin: false,
+      }
+    )
+
+    const [reviews, setReviews] = useState([])
+
     const [star, setStar] = useState<number>(0)
     
     const setSelectedColor = (color) => {
@@ -87,6 +103,8 @@ function Product() {
       on: false
     })
 
+    console.log('WWWWWWWWWWW', reviews);
+    
     const toast = (text, type) => {
       setToastDetails({
         text: text,
@@ -96,20 +114,47 @@ function Product() {
     }
     /* =================================================== */
 
-    useEffect(() => {
 
+
+    useEffect(() => {
+      const fetchReview = async () => {
+        await axios.post(`/api/review/get`, {
+        productSlug: router.query.slug
+      }).then((res) => {
+        if (res.data.Error) {
+          console.log("OWWWWWWWWWWWWWWWWW");
+          
+          
+        } else {
+          setReviews(res.data)
+          console.log(res.data, "KKKKKKKKKKKKK");
+          
+        }
+      })
+    }
       const fetchProduct = async () => {
         await axios.get(`/api/product/${router.query.slug}`).then((res)=> {setProduct(res.data); setAddCart({...addCart, _id: res.data._id, name: res.data.name, stock: res.data.countInStock, image: res.data.image, price: res.data.price})}).catch((err) => {console.log(err);
-        })
+        });
     }
+
+    
         
       if (router.isReady) {
+        fetchReview()
         fetchProduct()
+        
+        
       }
 
     }, [router.isReady])
-    
-
+    console.log(reviews, "PPPPPPPPPPPPPPPPPp");
+    useEffect(() => {
+      setMount(true)
+    },[])
+    var ratings = 0
+    reviews?.map((rev, i) => {
+          ratings = ratings + rev.rating
+      })
     
 
     const handleAddCart = () => {
@@ -150,6 +195,34 @@ function Product() {
       }
     }
 
+    const handleStar = (e: number) => {
+      setReviewForm({...reviewForm, rating: e})
+    }
+
+
+    const handleSubmitReview = async (e) => {
+      e.preventDefault();
+      setReviewForm({...reviewForm, product: product._id, productSlug: `${router.query.slug}`, user: state.user._id, rating: star, isAdmin: state.user.isAdmin})
+      if (!reviewForm.rating) {
+        toast("Please add a star", "error")
+      } else {
+        await axios.post("/api/review/post", reviewForm).then((res) => {
+          if (res.data.Error) {
+            toast(res.data.Error, "error")
+          } else {
+            toast("You made a review", "success")
+            console.log(res.data);
+            
+            setReviews([...reviews, res.data])
+          }
+        })
+      }
+    }
+
+    if (!mount) {
+      return <></>
+    }
+
 
   return (
     <div>
@@ -187,8 +260,8 @@ function Product() {
               <p className='text-4xl'>${product.price}</p>
             </div>
             <div className='flex mt-2 gap-2 items-center'>
-              <Rating rating={product.rating}/>
-              <p className='italic text-md'>Read Reviews ({product.numReviews})</p>
+              <Rating rating={ratings/reviews.length}/>
+              <p className='italic text-md'>Read Reviews ({reviews.length})</p>
               
             </div>
             {
@@ -206,7 +279,7 @@ function Product() {
               product.sizes.length > 0 ?
               <div className='mt-4'>
               <p className='text-lg font-semibold'>Select size/width</p>
-              <div className='flex gap-4 mt-4'>
+              <div className='flex flex-wrap gap-4 mt-4'>
                 {
                   product ? product.sizes.map((size, i) => (
                     <p className={`uppercase py-2 px-4 outline-dashed cursor-pointer ${size === addCart.size ? 'bg-[#D6BFA2]' : null}`} onClick={() => {
@@ -222,7 +295,7 @@ function Product() {
                 <p className='text-sm'>ORX CLOTHING</p>
                 <div className='grow h-[0.5px] bg-slate-600'/>
             </div>
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-col gap-4 sm:gap-0 sm:flex-row items-center justify-between'>
               <div id='quantity' className='flex gap-2 items-center'>
                 <p className='text-lg font-medium'>Quantity</p>
                 <input type="number" value={addCart.quantity} min="1" max={product.countInStock} className='p-2 flex'/>
@@ -243,6 +316,28 @@ function Product() {
               </div>
               
             </div>
+            {/* <PayPalScriptProvider options={{ "client-id": "ARphk-P4T1W_JGwOQlyk0ZjIF3UJPdy3K0kaW-Iij9jzFyd9W1N4xmh_jfgDlHkJhGHeGL23NJasMr7x", }}>
+              <PayPalButtons
+                createOrder={(data, actions) => {
+                    return actions.order.create({
+                        purchase_units: [
+                            {
+                                amount: {
+                                    value: "1.99",
+                                },
+                            },
+                        ],
+                    });
+                }}
+                onApprove={(data, actions) => {
+                    return actions.order.capture().then((details) => {
+                        const name = details.payer.name.given_name;
+                        alert(`Transaction completed by ${name}`);
+                    });
+                }}
+            />
+
+        </PayPalScriptProvider> */}
             <div className='mt-4'>
               <p className='font-semibold text-lg'>Description</p>
               <div className='p-2'>
@@ -254,57 +349,47 @@ function Product() {
               <div className='pt-4'>
                 <div id='postReview'>
                   <p className='mb-2'>Post a review</p>
-                  <RateIt starNumber={star} setStarNumber={setStar}/>
-                  <form>
+                  <RateIt starNumber={reviewForm.rating} setStarNumber={handleStar}/>
+                  <form onSubmit={handleSubmitReview}>
                     <div className='relative'>
-                      <textarea placeholder='Describe (Optional)' className='p-2 mt-2 outline-none resize-none w-[100%] h-24'>
+                      <textarea value={reviewForm.message} onChange={(e) => {
+                        setReviewForm({...reviewForm, message: e.target.value})
+                      }} placeholder='Describe (Optional)' className='p-2 mt-2 outline-none resize-none w-[100%] h-24'>
 
                       </textarea>
-                      <Button className='absolute bottom-2 right-2 p-2 rounded-full hover:ring-0' submit={true}><FaPaperPlane/></Button>
+                      <Button className='absolute bottom-2 right-2 p-2 rounded-full hover:ring-0' submit><FaPaperPlane/></Button>
                     </div>
                   </form>
-                  <p className='mb-2'>Reviews (3)</p>
+                  {
+                    reviews.length > 0 ? <p className='mb-2'>Reviews ({reviews.length})</p> :
+                    <p className='mb-2'>No reviews yet</p>
+                  }
                   <div>
-                    <div id='review' className='border-b-2 border-zinc-700 pt-2 pb-4'>
+                    {
+                      reviews?.map((review, i) => (
+                        <div key={i} id='review' className='border-b-2 border-zinc-700 pt-2 pb-4'>
                       <div className='flex items-center gap-2'>
-                        <div className='relative w-10 h-10 rounded-full overflow-hidden'>
-                          <Image src={product.image} alt='mm' layout='fill' objectFit='cover' />
+                        <div className='relative w-10 h-10 flex items-center justify-center rounded-full overflow-hidden'>
+                          {/* <Image src={product.image} alt='mm' layout='fill' objectFit='cover' /> */}
+                          <p className='text-xl font-bold'>{review.user.name.slice(0,1)}</p>
                         </div>
-                        <div className='flex flex-col justify-center items-center'>
-                          <p>Angela Jimenez</p>
-                          <Rating rating={3} starSize="text-md"/>
+                        <div className='flex relative flex-col justify-center items-center'>
+                          <p className='absolute top-0 right-[-4rem] bg-zinc-300 text-[#00892c] py-1 px-2 rounded-md text-[11px]'>Admin</p>
+                          <p>{review.userName}</p>
+                          <Rating rating={review.rating} starSize="text-md"/>
                         </div>
                       </div>
-                      <p className='mt-4'>This product ech balah la blah blah bal</p>
+                      <p className='mt-4 px-8'>{review.message}</p>
                     </div>
-                    <div id='review' className='border-b-2 border-zinc-700 pt-2 pb-4'>
-                      <div className='flex items-center gap-2'>
-                        <div className='relative w-10 h-10 rounded-full overflow-hidden'>
-                          <Image src={product.image} alt='mm' layout='fill' objectFit='cover' />
-                        </div>
-                        <div className='flex flex-col justify-center items-center'>
-                          <p>Angela Jimenez</p>
-                          <Rating rating={3} starSize="text-md"/>
-                        </div>
-                      </div>
-                      <p className='mt-4'>This product ech balah la blah blah bal</p>
-                    </div>
-                    <div id='review' className='border-b-2 border-zinc-700 pt-2 pb-4'>
-                      <div className='flex items-center gap-2'>
-                        <div className='relative w-10 h-10 rounded-full overflow-hidden'>
-                          <Image src={product.image} alt='mm' layout='fill' objectFit='cover' />
-                        </div>
-                        <div className='flex flex-col justify-center items-center'>
-                          <p>Angela Jimenez</p>
-                          <Rating rating={3} starSize="text-md"/>
-                        </div>
-                      </div>
-                      <p className='mt-4'>This product ech balah la blah blah bal</p>
-                    </div>
+                      ))
+                    }
+                    
+                    
                     
                   </div>
                 </div>
               </div>
+              
             </div>
           </div>
         </main>

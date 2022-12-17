@@ -9,8 +9,10 @@ import { recentOrder } from '../../../data/products'
 import Head from 'next/head'
 import { Store } from '../../../store/Store'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
+import axios from 'axios'
 
-function Dashboard() {
+function Customer() {
 
   
 
@@ -41,6 +43,15 @@ function Dashboard() {
   const [mount, setMount] = useState<boolean>(false)
   const {state, dispatch} = useContext(Store)
   const router = useRouter()
+  const [customers, setCustomers] = useState([])
+
+  const fetchCustomers = async () => {
+    await axios.get('/api/user/customers').then((res) => {
+      setCustomers(res.data)
+    })
+  }
+
+  
 
   useEffect(() => {
     if (state.user) {
@@ -55,12 +66,14 @@ function Dashboard() {
   }, [])
 
   useEffect(() => {
+    fetchCustomers()
     setMount(true)
   }, [])
 
   if (!mount) {
     return null
   }
+
   
   
 
@@ -72,44 +85,37 @@ function Dashboard() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <main className='px-2 md:px-4 flex'>
-            <SideMenuAdmin/>
+            <SideMenuAdmin active='Customer'/>
             <div className='p-4 px-4 md:px-8 grow'>
-              <p className=' text-xl font-semibold'>Howdy! Boss Mau</p>
-              <div className='px-2 mt-4'>
-                <p className='font-bold text-lg'>Dashboard</p>
-                <div className='flex flex-col lg:flex-row gap-4 mt-4 justify-around'>
-                  
+              <p>Customer</p>
+              <table className='w-[100%] mt-4 overflow-x-auto'>
+                <thead>
+                  <tr className=' bg-[#D3BDA0] rounded-tr-md'>
+                    <th className='p-2 text-left'>Name</th>
+                    <th className='text-right'>Email</th>
+                    <th className='text-right'>Items Bought</th>
+                    <th className='p-2 text-right'>Total Spent ($)</th>
+                  </tr>
+                </thead>
+                <tbody className=''>
                   {
-                    cardDetails.map((card, i) => (
-                      <AdminCard key={i} dollarSign={card.isDollar} icon={card.icon} color={card.color} text={card.text} number={card.number}/>
+                    customers.map((customer, i) => (
+                      <tr key={i}>
+                    <td className='font-bold px-2'>{customer.name}</td>
+                    <td className='text-right font-thin'><Link href={`mailto: ${customer.email}`}>redstone@gmail.com</Link></td>
+                    <td className='text-right'>{customer.itemsBought > 0 ? `${customer.itemsBought} items` : 'None'}</td>
+                    <td className='text-right font-semibold px-2 py-2'>${customer.totalSpent.toLocaleString('en-US')}</td>
+                  </tr>
                     ))
                   }
                   
-                </div>
-                <p className='font-bold text-md mt-8'>Recent Orders</p>
-                <div className='mt-2 overflow-x-auto'>
-                  <table className='w-[100%] overflow-x-auto '>
-                    <tbody>
-                    {
-                      recentOrder.map((order, i) => (
-                        <tr key={i} className='border-b-[0.5px] h-10 border-zinc-300'>
-                          <td>{i+1}</td>
-                          <td className='font-semibold px-[15px]'>{order.name}</td>
-                          <td className='text-right px-[8px]'>{order.email}</td>
-                          <td className='text-right px-[8px]'>${order.cost.toLocaleString("en-US")}</td>
-                          <td className='text-right px-[8px]'><span className={`bg-white text-[12px] py-1 px-2 rounded-lg ${order.status === 'delivered' ? 'text-green-600' : order.status === 'shipped' ? 'text-blue-600' : 'text-red-600'}`}>{order.status}</span></td>
-                          <td className='text-right text-[11px] px-[8px] font-thin'>{order.time} hours ago</td>
-                        </tr>
-                      ))
-                    }
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+                  
+                </tbody>
+              </table>
             </div>
         </main>
     </div>
   )
 }
 
-export default Dashboard
+export default Customer

@@ -29,7 +29,7 @@ function ProductCard({product}) {
                     <Image className='group-hover/image:scale-110 hover:ease-in ease-out duration-100' layout='fill' objectFit='cover' src={product.image} alt='product'/>
                 </div>
                 <div className='p-2'>
-                    <p className='font-semibold'>{product.name}</p>
+                    <p className='font-semibold'>{product.name.slice(0, 50)} {product.name.length > 50 ? '...' : null}</p>
                     <p>{product.originalPrice !== 0 ? <span className='line-through text-gray-600'>${product.originalPrice}</span> : null} ${product.price}</p>
                     {product.numSold !== 0 ? <p className='absolute bottom-1 right-2 text-[12px]'>{product.numSold} Sold</p> : null}
                 </div>

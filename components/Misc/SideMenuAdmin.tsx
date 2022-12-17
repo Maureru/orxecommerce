@@ -1,13 +1,18 @@
 import { motion, useAnimation } from 'framer-motion'
 import Link from 'next/link'
-import React, { useEffect, useRef } from 'react'
+import { useRouter } from 'next/router'
+import React, { useContext, useEffect, useRef } from 'react'
 import { BiLogOutCircle } from 'react-icons/bi'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { AdminMenu } from '../../data/products'
+import { Store } from '../../store/Store'
 import Button from './Button'
 import Icon from './Icon'
 
 function SideMenuAdmin({active = "Home", role = "admin"}) {
+
+  const {dispatch} = useContext(Store);
+  const router = useRouter()
 
   const anim = {
     hide: {
@@ -75,7 +80,11 @@ function SideMenuAdmin({active = "Home", role = "admin"}) {
         
             
         </ul>
-        <Button className='flex bg-[#D3BDA0] gap-2 items-center absolute bottom-4 px-12 py-2'><BiLogOutCircle/> Logout</Button>
+        <Button onClick={() => {
+          console.log('click');
+          dispatch({type: 'LOGOUT'})
+          router.push('/')
+        }} className='flex bg-[#D3BDA0] gap-2 items-center absolute bottom-4 px-12 py-2'><BiLogOutCircle/> Logout</Button>
       </div>
       <motion.div ref={refMenu} variants={anim} initial="hide" animate={control} style={{boxShadow: '9px 3px 15px -3px rgba(0,0,0,0.1)'}} className='fixed z-50 bg-[#F4ECE3] lg:hidden top-0 left-0 w-[200px] px-2 py-4 h-screen'>
         <p className='font-thin text-lg'>ORX Clothing<span style={{fontVariant: 'small-caps'}} className='text-[11px]'>admin</span></p>
@@ -88,7 +97,11 @@ function SideMenuAdmin({active = "Home", role = "admin"}) {
         
             
         </ul>
-        <Button className='flex bg-[#D3BDA0] gap-2 items-center absolute bottom-4 px-12 py-2'><BiLogOutCircle/> Logout</Button>
+        <Button onClick={() => {
+          console.log('click');
+          dispatch({type: 'LOGOUT'})
+          router.push('/')
+        }} className='flex bg-[#D3BDA0] gap-2 items-center absolute bottom-4 px-12 py-2'><BiLogOutCircle/> Logout</Button>
       </motion.div>
     </div>
   )

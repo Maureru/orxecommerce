@@ -10,7 +10,7 @@ function AddProduct({isEdit = false, editProduct ,isOpen = false, close = () => 
     const imageRef = useRef<HTMLInputElement>()
     const moreImageRef = useRef<HTMLInputElement>()
 
-    const [product, setProduct] = useState<OrxProducts>({
+    const [product, setProduct] = useState({
         name: '',
         slug: '',
         category: [],
@@ -300,7 +300,7 @@ function AddProduct({isEdit = false, editProduct ,isOpen = false, close = () => 
                     }
                 </div>
             </div>
-            <Button onClick={handleAddProduct} className='mt-4 p-2 bg-[#D3BDA0]'>Add Product</Button>
+            <Button onClick={handleAddProduct} className='mt-4 p-2 bg-[#D3BDA0]'>{isEdit ? 'Update' : 'Add'} Product</Button>
         </div>
     </div>
   )
