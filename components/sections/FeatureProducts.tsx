@@ -2,7 +2,6 @@ import axios from 'axios'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { Products } from '../../data/products'
 import Corousel from '../Misc/Corousel'
 import ProductCard from '../Misc/ProductCard'
 
