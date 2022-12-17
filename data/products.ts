@@ -9,6 +9,7 @@ import { IoIosPeople } from "react-icons/io";
 
 
 export type OrxProducts = {
+    _id: string,
     name: string,
     slug: string,
     category: string[],
@@ -27,7 +28,7 @@ export type OrxProducts = {
 
 
 
-export const Products: OrxProducts[] = [
+/* export const Products: OrxProducts[] = [
     {
         name: 'S-Shirt Lego',
         slug: 'S-shirt-lego',
@@ -140,7 +141,7 @@ export const Products: OrxProducts[] = [
         numReviews: 3,
         numSold: 0
     },
-]
+] */
 
 export const AdminMenu: {
     name: string,
