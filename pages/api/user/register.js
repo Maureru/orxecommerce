@@ -4,9 +4,9 @@ import bcrypt from 'bcrypt';
 
 export default async function handler(req, res) {
   const { name, email, isAdmin } = req.body;
+  await db.connect();
 
   try {
-    await db.connect();
     const isEmailExist = await User.findOne({ email: email });
     if (isEmailExist) return res.json({ Error: 'Email already exist!' });
 

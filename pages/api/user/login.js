@@ -7,9 +7,9 @@ export default async function handler(req, res) {
   const { email, password } = req.body;
 
   try {
-    db.connect();
+    await db.connect();
     const user = await User.findOne({ email: email });
-    db.disconnect();
+    await db.disconnect();
     if (!user) {
       res.json({ Error: 'You are not registered!' });
     } else {
