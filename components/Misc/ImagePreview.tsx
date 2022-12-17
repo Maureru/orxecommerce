@@ -36,3 +36,4 @@ function ImagePreview({product}) {
 }
 
 export default ImagePreview
+

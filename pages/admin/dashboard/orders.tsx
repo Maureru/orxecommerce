@@ -1,13 +1,30 @@
 import axios from 'axios'
 import Head from 'next/head'
-import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import React, { useContext, useEffect, useState } from 'react'
 import OrderRow from '../../../components/Misc/OrderRow'
 import SideMenuAdmin from '../../../components/Misc/SideMenuAdmin'
+import { Store } from '../../../store/Store'
 
 function Orders() {
 
   const [orders, setOrders] = useState([])
   const [mount, setMount] = useState(false)
+
+  const {state, dispatch} = useContext(Store)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (state.user) {
+      if (!state.user.isAdmin) {
+        console.log("You're not authorize!");
+        router.push('/')
+      }
+    } else {
+      console.log('Please login first!');
+      router.push('/')
+    }
+  }, [])
 
   useEffect(() => {
     setMount(true)

@@ -375,7 +375,7 @@ function Product() {
                         </div>
                         <div className='flex relative flex-col justify-center items-center'>
                           <p className='absolute top-0 right-[-4rem] bg-zinc-300 text-[#00892c] py-1 px-2 rounded-md text-[11px]'>Admin</p>
-                          <p>{review.userName}</p>
+                          <p>{review.user.name}</p>
                           <Rating rating={review.rating} starSize="text-md"/>
                         </div>
                       </div>

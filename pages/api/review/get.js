@@ -3,9 +3,10 @@ import db from '../../../model/db';
 
 export default async function handler(req, res) {
   /* const {userName, userId, isAdmin, message} = req.body; */
+  await db.connect();
 
   try {
-    await db.connect();
+    
     const review = await Review.find({
       productSlug: req.body.productSlug,
     })
